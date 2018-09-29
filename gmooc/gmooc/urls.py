@@ -38,7 +38,7 @@ urlpatterns = [
     path('teacher/', include(('organization.urls', 'organization'), namespace='teacher')),
     re_path(r'media/(?P<path>.*)$', serve, {'document_root': MEDIA_ROOT}),
     # re_path(r'static/(?P<path>.*)$', serve, {'document_root': STATIC_ROOT}),
-    path('ueditor/', include('DjangoUeditor.urls')),
+    # path('ueditor/', include('DjangoUeditor.urls')),
 ]
 
 

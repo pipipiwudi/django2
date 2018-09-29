@@ -1,5 +1,5 @@
 from datetime import datetime
-from DjangoUeditor.models import UEditorField
+# from DjangoUeditor.models import UEditorField
 from django.db import models
 from organization.models import CourseOrg, Teacher
 
@@ -7,7 +7,8 @@ from organization.models import CourseOrg, Teacher
 class Course(models.Model):
     name = models.CharField(max_length=50, verbose_name='课程名')
     desc = models.CharField(max_length=300, verbose_name='课程描述')
-    detail = UEditorField(verbose_name='课程详情', width=600, height=300, imagePath='courses/ueditor/', filePath='courses/ueditor/', default='')
+    detail = models.TextField(verbose_name='课程详情')
+    # detail = UEditorField(verbose_name='课程详情', width=600, height=300, imagePath='courses/ueditor/', filePath='courses/ueditor/', default='')
     degree = models.CharField(max_length=10, choices=(('cj', '初级'), ('zj', '中级'), ('gj', '高级')), verbose_name='课程难度')
     learn_times = models.IntegerField(default=0, verbose_name='学习时长')
     stutents = models.IntegerField(default=0, verbose_name='学习人数')
