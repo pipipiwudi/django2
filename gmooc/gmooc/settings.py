@@ -97,9 +97,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'mxonline',
-        'USER': 'dux',
+        'USER': 'root',
         'PASSWORD':'root',
-        'HOST': '182.1.8.237',
+        'HOST': '123.56.29.126',
     }
 }
 
