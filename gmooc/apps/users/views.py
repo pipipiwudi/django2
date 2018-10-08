@@ -17,35 +17,21 @@ from courses.models import Course
 from organization.models import CourseOrg, Teacher
 
 
+# 重写此方法可通过多种方式登录
 class CustomBackend(ModelBackend):
     def authenticate(self, request, username=None, password=None, **kwargs):
         try:
             user = UserProfile.objects.get(Q(username=username)|Q(email=username))
             if user.check_password(password):
                 return user
-
         except Exception as e:
             return None
 
 
-# def user_login(request):
-#     if request.method == 'POST':
-#         user_name = request.POST.get('username', '')
-#         pass_word = request.POST.get('password', '')
-#         user = authenticate(username=user_name, password=pass_word)
-#         if user is not None:
-#             login(request, user)
-#             return render(request, 'index.html', {'user': user})
-#         else:
-#             return render(request, 'login.html', {'msg': '用户名或密码错误'})
-#
-#     elif request.method == 'GET':
-#         return render(request, 'login.html')
-
 class ResetView(View):
-
     def get(self, request, code):
         all_records = EmailVerifyRecord.objects.filter(code=code)
+        # 判断重置链接是否有效
         if all_records:
             for record in all_records:
                 email = record.email
@@ -63,9 +49,11 @@ class ModifyView(View):
             pwd = request.POST.get('password', '')
             pwd2 = request.POST.get('password2', '')
             email = request.POST.get('email', '')
+            # 判断密码是否一致
             if pwd != pwd2:
                 return render(request, 'password_reset.html', {'email': email,'msg': '密码不一致'})
             user = UserProfile.objects.get(email=email)
+            # 将明文密码加密make_password
             user.password = make_password(pwd)
             user.save()
             return render(request, 'login.html')
@@ -82,6 +70,7 @@ class ForgetView(View):
 
     def post(self, request):
         forget_form = ForgetForm(request.POST)
+        # 通过form检查字段合法
         if forget_form.is_valid():
             email = request.POST.get('email', '')
             send_register_email(email,'forget')
@@ -93,6 +82,7 @@ class ForgetView(View):
 class ActiveView(View):
 
     def get(self, request, code):
+        # 判断激活账户链接是否有效
         all_records = EmailVerifyRecord.objects.filter(code=code)
         if all_records:
             for record in all_records:
@@ -113,8 +103,10 @@ class RegisterView(View):
 
     def post(self, request):
         register_form = RegisterForm(request.POST)
+        # 通过form检查字段合法
         if register_form.is_valid():
             user_name = request.POST.get('email', '')
+            # 判断邮箱是否已经注册
             if UserProfile.objects.filter(email=user_name):
                 return render(request, 'register.html', {'register_form': register_form, 'msg': '用户已存在'})
             pass_word = request.POST.get('password', '')
@@ -122,8 +114,10 @@ class RegisterView(View):
             user.username = user_name
             user.email = user_name
             user.password = make_password(pass_word)
+            # 默认激活状态为false
             user.is_active = False
             user.save()
+            # 用户信息通知
             usermessage = UserMessage()
             usermessage.user = user.id
             usermessage.message = '欢迎注册'
@@ -144,9 +138,12 @@ class LoginView(View):
         if login_form.is_valid():
             user_name = request.POST.get('username', '')
             pass_word = request.POST.get('password', '')
+            # 判断用户是否存在，账户密码是否正确
             user = authenticate(username=user_name, password=pass_word)
             if user is not None:
+                # 判断用户是否激活
                 if user.is_active:
+                    # 进行登录
                     login(request, user)
                     return redirect('/')
                 else:
@@ -166,6 +163,7 @@ class UserInfoView(View):
     def post(self, request):
         user_form = ModifyUserInfoForm(request.POST,instance=request.user)
         if user_form.is_valid():
+            # 通过modelform直接保存
             user_form.save()
             return HttpResponse('{"status":"success"}', content_type='application/json')
         else:
@@ -174,6 +172,7 @@ class UserInfoView(View):
 
 class UploadView(View):
     def post(self, request):
+        # 上传修改信息request.FILES
         upload_form = UploadForm(request.POST, request.FILES, instance=request.user)
         if upload_form.is_valid():
             upload_form.save()

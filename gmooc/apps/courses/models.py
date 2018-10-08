@@ -31,12 +31,15 @@ class Course(models.Model):
     def __str__(self):
         return self.name
 
+    # 获取学习人数
     def get_learn(self):
         return self.usercourse_set.all()[:5]
 
+    # 获取章节信息
     def get_course(self):
         return self.lesson_set.all()
 
+    # 获取课程资源信息
     def get_courseresource(self):
         return self.courseresource_set.all()
 
@@ -53,6 +56,7 @@ class Lesson(models.Model):
     def __str__(self):
         return self.name
 
+    # 获取视频信息
     def get_video(self):
         return self.vidio_set.all()
 
